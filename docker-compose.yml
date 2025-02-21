@@ -1,5 +1,4 @@
 services:
-
   frontend:
     build:
       context: ./frontend
@@ -13,7 +12,6 @@ services:
       - backend
     networks:
       - app_network
-
   backend:
     build:
       context: ./backend
@@ -41,7 +39,6 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app_network
-
   adminer:
     image: adminer
     restart: always
