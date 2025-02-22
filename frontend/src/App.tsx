@@ -1,12 +1,23 @@
-import './App.css'
+import { JSX } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
+
+import AuthPage from "./pages/auth/AuthPage";
+
+import "./App.css";
 
 function App() {
+  const routes: JSX.Element = (
+    <Routes>
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="*" element={<Navigate to="/auth" />} />
+    </Routes>
+  );
 
   return (
-    <div>
-      <h1>UUID</h1>
-    </div>
-  )
+    <>
+      <Router>{routes}</Router>
+    </>
+  );
 }
 
-export default App
+export default App;
