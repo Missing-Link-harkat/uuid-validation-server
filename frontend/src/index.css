@@ -1,0 +1,17 @@
+:root {
+  font-size: 16px;
+  /* Base Colors */
+  --primary-color: #2d89e5; /* For buttons, accents, etc. */
+  --primary-dark: #1f5ba7; /* For active states or darker header */
+  --background-color: #f7f7f7; /* Soft background for the page */
+  --card-background: #fff; /* Card color remains white */
+  --text-color: #333; /* Dark text for readability */
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+}
