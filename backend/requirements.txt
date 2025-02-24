@@ -1,2 +1,5 @@
 fastapi[standard]
 pydantic
+sqlalchemy
+pyjwt
+passlib[bcrypt]
