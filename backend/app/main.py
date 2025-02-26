@@ -1,72 +1,27 @@
-from typing import Annotated
-
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
-
-fake_users_db = {
-    "Johndoe": {
-        "username": "johndoe",
-        "email": "johndoe@j.com",
-        "password": "fakehashedpassword"
-    },
-    "Alice": {
-        "username": "alice",
-        "email": "alice@j.com",
-        "password": "fakehashedpasswordsecond"
-    }
-}
+from fastapi import FastAPI,Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+from auth import create_access_token
+from schemas import User, Token, UserInDB
+from dependencies import get_current_user
+from users import UserModel, get_password_hash, authenticate_user
+from database import get_db
 
 app = FastAPI()
 
-def fake_hash_password(password: str):
-    return "fakehashed" + password
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-class User(BaseModel):
-    username: str
-    email: str
-    password: str
-
-
-class UserInDB(User):
-    hashed_password: str
-
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
-
-def fake_decode_token(token):
-    user = get_user(fake_users_db, token)
-    return user
-
-
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    user = fake_decode_token(token)
+@app.post("/token", response_model=Token)
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    print(user)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
+            detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
-
-
-@app.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user_dict = fake_users_db.get(form_data.username)
-    if not user_dict:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    user = UserInDB(**user_dict)
-    hashed_password = fake_hash_password(form_data.password)
-    if not hashed_password == user.hashed_password:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    
-    return {"access_token": user.username, "token_type": "bearer"}
-
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/users/me")
-async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
+def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
