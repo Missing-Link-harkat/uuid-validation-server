@@ -1,11 +1,13 @@
-FROM python:3.9
+FROM golang:1.24.1
 
-WORKDIR /code
+WORKDIR /app
 
-COPY ./requirements.txt /code/requirements.txt
+COPY go.mod go.sum ./
+RUN go mod download
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o app ./cmd/main.go
 
-COPY ./app /code/app
+EXPOSE 8080
 
-CMD ["fastapi", "run", "app/main.py", "--port", "80"]
+CMD ["./app"]
