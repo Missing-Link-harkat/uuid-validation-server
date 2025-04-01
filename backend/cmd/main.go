@@ -16,6 +16,17 @@ func main() {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
+	/*
+		password := "testpassword"
+		hashedPassword, err := utils.HashPassword(password)
+		if err != nil {
+			fmt.Println("Error hashing password:", err)
+			return
+		}
+
+		// Print the hashed password
+		fmt.Println("Hashed password:", hashedPassword)
+	*/
 	r := api.SetupRouter()
 	r.Run(":8080")
 }
