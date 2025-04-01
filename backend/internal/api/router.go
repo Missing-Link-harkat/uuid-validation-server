@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func setupRouter() *gin.Engine {
+func SetupRouter() *gin.Engine {
 	gin.SetMode(utils.GetEnv("GIN_MODE"))
 	r := gin.Default()
 	r.SetTrustedProxies([]string{"localhost"})
@@ -19,5 +19,6 @@ func setupRouter() *gin.Engine {
 		AllowCredentials: true,
 	}))
 
-	r.GET("/login", handlers.Login)
+	r.POST("/login", handlers.Login)
+	return r
 }
